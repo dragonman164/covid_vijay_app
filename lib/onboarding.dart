@@ -1,4 +1,5 @@
 import 'package:covid_vijay_app/admin_login.dart';
+import 'package:covid_vijay_app/user_home.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -57,7 +58,11 @@ class _OnboardingState extends State<Onboarding> {
             ),
             MaterialButton(
               splashColor: Colors.greenAccent,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) => UserHome(),
+                ));
+              },
               child: Text(
                 'Get Started',
                 style: TextStyle(fontSize: 22, color: Colors.white),
