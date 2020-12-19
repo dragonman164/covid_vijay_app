@@ -2,6 +2,7 @@ import 'package:covid_vijay_app/onboarding.dart';
 import 'package:covid_vijay_app/user_home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'check_status.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,9 @@ class MyApp extends StatelessWidget {
       ),
       home: Onboarding(),
       debugShowCheckedModeBanner: false,
+      routes: {
+        DisplayVaccinationStatus.routeName: (context)=>DisplayVaccinationStatus(),
+      },
     );
   }
 }
