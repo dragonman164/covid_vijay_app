@@ -2,6 +2,8 @@ import 'package:covid_vijay_app/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AdminDashboard extends StatefulWidget {
   @override
@@ -9,9 +11,18 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+  static double _vaccinated = 0, _notVaccinated = 0;
+  TextEditingController _textEditingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController();
+  }
+
   Map<String, double> dataMap = {
-    "vaccinated": 80,
-    "notvaccinated": 20,
+    "vaccinated": _vaccinated,
+    "notvaccinated": _notVaccinated,
   };
   @override
   Widget build(BuildContext context) {
@@ -65,6 +76,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                   color: Colors.orange[50],
                                   borderRadius: BorderRadius.circular(20.0)),
                               child: TextFormField(
+                                validator: (value) {
+                                  if (value.toString().length > 10)
+                                    return 'Invalid Aadhar Number';
+                                  return null;
+                                },
+                                controller: _textEditingController,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                   labelText: '   Enter the 10 digit Aadhar No.',
@@ -101,7 +118,49 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                   height: 57,
                                 ),
                                 MaterialButton(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    print(_textEditingController.text);
+                                    var response;
+                                    var requiredata;
+                                    var url =
+                                        'https://covid19-vaccine.herokuapp.com/api/';
+                                    try {
+                                      response = await http.get(url);
+                                      List Data = json.decode(response.body);
+
+                                      for (int i = 0; i < Data.length; i++) {
+                                        if (Data[i]["isVaccinated"])
+                                          _vaccinated++;
+
+                                        if (Data[i]["aadhar_number"]
+                                                .toString() ==
+                                            _textEditingController.text
+                                                .toString()) {
+                                          requiredata = Data[i];
+                                        }
+                                      }
+                                      _notVaccinated =
+                                          Data.length - _vaccinated;
+                                      requiredata["isVaccinated"] = true;
+                                    } catch (e) {
+                                      print('Error');
+                                    }
+                                    try {
+                                      response = await http.put(url, headers: {
+                                        'Content-type': 'application/json'
+                                      },body:json.encode(requiredata));
+                                      print(response.body);
+                                    } catch (e) {
+                                      print(e.toString());
+                                    }
+                                    setState(() {
+                                      dataMap = {
+                                        "vaccinated": _vaccinated,
+                                        "notvaccinated": _notVaccinated,
+                                      };
+
+                                    });
+                                  },
                                   child: Text(
                                     'Add',
                                     style: TextStyle(
@@ -256,16 +315,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            'Vaccines available in the stock:',
+                            'Vaccines available Per Day ',
                             style: TextStyle(
                                 color: Colors.red[200],
-                                fontSize: 20,
+                                fontSize: 17,
                                 fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
                         ),
                         Text(
-                          '2000',
+                          '2',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 22,
