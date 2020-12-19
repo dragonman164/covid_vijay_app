@@ -1,6 +1,7 @@
 import 'package:covid_vijay_app/admin_dashboard.dart';
 import 'package:covid_vijay_app/onboarding.dart';
 import 'package:covid_vijay_app/services/auth.dart';
+import 'package:covid_vijay_app/user_login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -172,7 +173,60 @@ class _AdminLoginState extends State<AdminLogin> {
                         margin: EdgeInsets.symmetric(horizontal: 20.0),
                         height: 80,
                       ),
-                    )),
+
+                      onPressed: () async {
+                        _key.currentState.save();
+                        _key.currentState.validate();
+                        dynamic user = await Authentication()
+                            .signIn(email: email, password: password);
+
+                        if (user == null)
+                          setState(() {
+                            credentialTrue = false;
+                          });
+                        if (credentialTrue == false)
+                          Text(
+                            "Wrong username or password",
+                            style: TextStyle(color: Colors.red),
+                          );
+                        if (_key.currentState.validate()) {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AdminDashboard(),
+                              ));
+                        }
+                      }),
+                )),
+            Container(
+              margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              width: double.maxFinite,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                textBaseline: TextBaseline.alphabetic,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Sign in as User?",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  SizedBox(width: 10),
+                  Hero(
+                    tag: "back_next",
+                    child: IconButton(
+                        padding: EdgeInsets.all(5),
+                        color: Colors.white,
+                        splashColor: Color(0xff02AE8B),
+                        iconSize: 30,
+                        icon: Icon(FontAwesomeIcons.backspace),
+                        onPressed: () {
+                          Navigator.pushReplacement(context, MaterialPageRoute(
+                            builder: (context) => UserLogin(),
+                          ));
+                        }),
+                  ),
+                ],
+
               ),
               Container(
                 margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
