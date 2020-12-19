@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
 
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: UserHome(),
+      home: Onboarding(),
       debugShowCheckedModeBanner: false,
     );
   }

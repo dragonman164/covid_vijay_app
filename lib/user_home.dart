@@ -1,4 +1,6 @@
+import 'package:covid_vijay_app/added_member_status.dart';
 import 'package:covid_vijay_app/constants.dart';
+import 'package:covid_vijay_app/get_details.dart';
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,15 +11,23 @@ class UserHome extends StatefulWidget {
 }
 
 class _UserHomeState extends State<UserHome> {
+  TextEditingController _textEditingController;
+  Future<Details> details;
+
+  @override
+  void initState() {
+    super.initState();
+    details = getDetails();
+  }
+
   Map<String, double> dataMap = {
-    "vaccinated": 8,
-    "notvaccinated": 2,
+    "vaccinated": 80,
+    "notvaccinated": 20,
   };
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-
         padding: EdgeInsets.all(10.0),
         child: ListView(
           children: [
@@ -38,20 +48,6 @@ class _UserHomeState extends State<UserHome> {
                     fontWeight: FontWeight.bold),
               ),
             ),
-            // Container(
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     borderRadius: BorderRadius.circular(20.0),
-            //   ),
-            //   padding: EdgeInsets.all(20.0),
-            //   child: Text(
-            //     'Looks like a lot of people are getting vaccinated.',
-            //     style: GoogleFonts.varelaRound(
-            //         foreground: Paint()..shader = linearGradient,
-            //         fontSize: 20.0,
-            //         fontWeight: FontWeight.bold),
-            //   ),
-            // ),
             Container(
               decoration: BoxDecoration(
                   color: Colors.white,
@@ -60,36 +56,6 @@ class _UserHomeState extends State<UserHome> {
                     BoxShadow(color: Colors.black26, blurRadius: 20.0)
                   ]),
               child: PieChart(
-
-        constraints: BoxConstraints.expand(),
-        decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/images/background.jpg'),
-              fit: BoxFit.cover),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 40.0, left: 10),
-                child: Text(
-                  'Hello Nitish!',
-                  style: TextStyle(color: Colors.white, fontSize: 40),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Looks like a lot of people are getting \nvaccinated.',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w200),
-                ),
-              ),
-              PieChart(
-
                 dataMap: dataMap,
                 animationDuration: Duration(milliseconds: 800),
                 chartLegendSpacing: 32,
@@ -103,9 +69,7 @@ class _UserHomeState extends State<UserHome> {
                   showLegends: true,
                   legendShape: BoxShape.circle,
                   legendTextStyle: TextStyle(
-
                     color: Colors.black,
-
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -115,7 +79,6 @@ class _UserHomeState extends State<UserHome> {
                   showChartValuesInPercentage: false,
                   showChartValuesOutside: false,
                 ),
-
               ),
             ),
             SizedBox(
@@ -128,7 +91,8 @@ class _UserHomeState extends State<UserHome> {
                   color: Colors.orange[50],
                   borderRadius: BorderRadius.circular(20.0)),
               child: TextFormField(
-                keyboardType: TextInputType.emailAddress,
+                controller: _textEditingController,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   prefixIcon: Image.asset(
                     'assets/images/aadhar.png',
@@ -148,7 +112,18 @@ class _UserHomeState extends State<UserHome> {
               height: 20.0,
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                FutureBuilder<Details>(
+                  future: details,
+                  builder: (context, snapshot) {
+                   
+                      return Dialog(
+                        
+                        child: Text(snapshot.data.name),
+                      );
+                  },
+                );
+              },
               child: new Container(
                 decoration: BoxDecoration(
                     border: Border.all(width: 2.0, color: Colors.greenAccent),
@@ -180,93 +155,39 @@ class _UserHomeState extends State<UserHome> {
                 height: 80,
               ),
             ),
+            SizedBox(
+              height: 50,
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddedMemberStatus(),
+                    ));
+              },
+              child: new Container(
+                decoration: BoxDecoration(
+                    border: Border.all(width: 2.0, color: Colors.greenAccent),
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(20.0)),
+                padding: EdgeInsets.all(10.0),
+                child: Center(
+                  child: Text(
+                    'Check added member\'s status',
+                    style: GoogleFonts.varelaRound(
+                        color: Colors.greenAccent,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0),
+                  ),
+                ),
+                margin: EdgeInsets.symmetric(horizontal: 20.0),
+                height: 50,
+              ),
+            ),
           ],
-
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-          icon: Icon(Icons.add),
-          backgroundColor: Color(0xff02AE8B),
-          onPressed: () {
-            showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return Container(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 18.0),
-                          child: Container(
-                              height: 100,
-                              width: 100,
-                              child: CircleAvatar(
-                                child:
-                                    Image.asset('assets/images/addmember.png'),
-                              )),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'add your family members',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 17),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'protect your family from corona now',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w300,
-                                fontSize: 17),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 50.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Color(0xff02AE8B),
-                                borderRadius: BorderRadius.circular(15)),
-                            child: IconButton(
-                              color: Colors.white,
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return Dialog(
-                                      child: Container(
-                                        height: 200,
-                                        width: 200,
-                                        color: Color(0xff070413),
-                                        child: Column(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Text('Add a person',style: TextStyle(color: Colors.white,fontSize: 25),),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                              icon: Icon(Icons.add),
-                              iconSize: 30,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    height: MediaQuery.of(context).size.height / 2,
-                    decoration: BoxDecoration(color: Color(0xff070413)),
-                  );
-                });
-          },
-          label: Text('Add members')),
     );
   }
 }
