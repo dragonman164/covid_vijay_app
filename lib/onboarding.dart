@@ -1,5 +1,6 @@
 import 'package:covid_vijay_app/admin_login.dart';
 import 'package:covid_vijay_app/user_home.dart';
+import 'package:covid_vijay_app/user_login.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -60,7 +61,7 @@ class _OnboardingState extends State<Onboarding> {
               splashColor: Colors.greenAccent,
               onPressed: () {
                 Navigator.pushReplacement(context, MaterialPageRoute(
-                  builder: (context) => UserHome(),
+                  builder: (context) => UserLogin(),
                 ));
               },
               child: Text(
@@ -77,26 +78,7 @@ class _OnboardingState extends State<Onboarding> {
             SizedBox(
               height: 10,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Log in as ADMIN',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
-                IconButton(
-                  color: Colors.white,
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AdminLogin(),
-                        ));
-                  },
-                  icon: Icon(FontAwesomeIcons.signInAlt),
-                )
-              ],
-            ),
+          
           ],
         ),
       ),

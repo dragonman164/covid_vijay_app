@@ -1,17 +1,16 @@
-import 'package:covid_vijay_app/admin_dashboard.dart';
-import 'package:covid_vijay_app/onboarding.dart';
+import 'package:covid_vijay_app/admin_login.dart';
 import 'package:covid_vijay_app/services/auth.dart';
-import 'package:covid_vijay_app/user_login.dart';
+import 'package:covid_vijay_app/user_home.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class AdminLogin extends StatefulWidget {
+class UserLogin extends StatefulWidget {
   @override
-  _AdminLoginState createState() => _AdminLoginState();
+  _UserLoginState createState() => _UserLoginState();
 }
 
-class _AdminLoginState extends State<AdminLogin> {
-  final _key = GlobalKey<FormState>();
+class _UserLoginState extends State<UserLogin> {
+    final _key = GlobalKey<FormState>();
   TextEditingController _textEditingController;
   String email;
   String password;
@@ -19,7 +18,7 @@ class _AdminLoginState extends State<AdminLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff070413),
+            backgroundColor: Color(0xff070413),
       body: SingleChildScrollView(
         child: Form(
           key: _key,
@@ -29,7 +28,7 @@ class _AdminLoginState extends State<AdminLogin> {
             ),
             Center(
                 child: Text(
-              'Login As Admin',
+              'User Login',
               style: TextStyle(color: Colors.white, fontSize: 30),
             )),
             SizedBox(
@@ -122,7 +121,7 @@ class _AdminLoginState extends State<AdminLogin> {
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AdminDashboard(),
+                                builder: (context) => UserHome(),
                               ));
                         }
                       }),
@@ -136,24 +135,22 @@ class _AdminLoginState extends State<AdminLogin> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Sign in as User?",
+                    "Sign in as Admin?",
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   ),
                   SizedBox(width: 10),
-                  Hero(
-                    tag: "back_next",
-                    child: IconButton(
+                  IconButton(
                         padding: EdgeInsets.all(5),
                         color: Colors.white,
                         splashColor: Color(0xff02AE8B),
                         iconSize: 30,
-                        icon: Icon(FontAwesomeIcons.backspace),
+                        icon: Icon(FontAwesomeIcons.signInAlt),
                         onPressed: () {
                           Navigator.pushReplacement(context, MaterialPageRoute(
-                            builder: (context) => UserLogin(),
+                            builder: (context) => AdminLogin(),
                           ));
                         }),
-                  ),
+                  
                 ],
               ),
             ),

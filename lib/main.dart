@@ -1,4 +1,5 @@
 import 'package:covid_vijay_app/onboarding.dart';
+import 'package:covid_vijay_app/user_home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
 
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Onboarding(),
+      home: UserHome(),
       debugShowCheckedModeBanner: false,
     );
   }
