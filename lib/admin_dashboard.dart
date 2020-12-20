@@ -159,20 +159,22 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                                     children: [
                                                       IconButton(
                                                         icon: Icon(Icons.close),
-                                                        onPressed: (){
-                                                          Navigator.pop(context);
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
                                                         },
                                                       ),
                                                       Padding(
                                                         padding:
-                                                            const EdgeInsets.all(
-                                                                8.0),
+                                                            const EdgeInsets
+                                                                .all(8.0),
                                                         child: Center(
                                                             child: Text(
                                                           'Already Vaccinated',
                                                           style: TextStyle(
                                                               fontWeight:
-                                                                  FontWeight.bold),
+                                                                  FontWeight
+                                                                      .bold),
                                                         )),
                                                       ),
                                                     ],
@@ -375,6 +377,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             InkWell(
               onTap: () async {
                 await Authentication().signOut();
+                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                  builder: (context) => AdminLogin(),
+                ), (route) => false);
               },
               child: new Container(
                 decoration: BoxDecoration(
