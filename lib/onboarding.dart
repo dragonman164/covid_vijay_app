@@ -1,12 +1,11 @@
-  
+import 'dart:convert';
 import 'package:covid_vijay_app/admin_login.dart';
 import 'package:covid_vijay_app/user_home.dart';
-import 'package:covid_vijay_app/user_login.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'constants.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:simple_animations/simple_animations.dart';
+import 'package:http/http.dart' as http;
 
 class Onboarding extends StatefulWidget {
   @override
@@ -14,6 +13,9 @@ class Onboarding extends StatefulWidget {
 }
 
 class _OnboardingState extends State<Onboarding> {
+  Map<String, double> dataMap;
+   double vaccinated=0;
+ double notvaccinated=0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,12 +108,28 @@ class _OnboardingState extends State<Onboarding> {
                 focusColor: Colors.white,
                 hoverColor: Colors.white,
                 splashColor: Colors.white,
-                onTap: () {
+                onTap: () async{
+                   var url = 'https://covid19-vaccine.herokuapp.com/api/';
+                  final response = await http.get(url);
+
+                  List Data = json.decode(response.body);
+                  for (int i = 0; i < Data.length; i++) {
+                    if (Data[i]["isVaccinated"]) vaccinated++;
+                    if(!Data[i]["isVaccinated"]) notvaccinated++;
+                  }
+                  setState(() {
+                    dataMap={
+                      "vaccinated": vaccinated,
+                      "notvaccinated": notvaccinated,
+                    };
+                  });
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => UserHome(),
+                      builder: (context) => UserHome(dataMap: {"vaccinated":vaccinated,"notvaccinated":notvaccinated,})
+                      
                     ),
+                    
                   );
                 },
                 child: new Container(

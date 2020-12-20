@@ -12,4 +12,7 @@ class Authentication {
       return "Wrong email address";
     }
   }
+  Future signOut() async{
+    await _auth.signOut();
+  }
 }

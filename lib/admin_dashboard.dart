@@ -1,18 +1,37 @@
+import 'package:covid_vijay_app/admin_login.dart';
 import 'package:covid_vijay_app/constants.dart';
+import 'package:covid_vijay_app/onboarding.dart';
+import 'package:covid_vijay_app/services/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AdminDashboard extends StatefulWidget {
+  Map<String, double> dataMap;
+  AdminDashboard({this.dataMap});
   @override
   _AdminDashboardState createState() => _AdminDashboardState();
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  Map<String, double> dataMap = {
-    "vaccinated": 80,
-    "notvaccinated": 20,
-  };
+  TextEditingController _textEditingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,6 +84,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                   color: Colors.orange[50],
                                   borderRadius: BorderRadius.circular(20.0)),
                               child: TextFormField(
+                                validator: (value) {
+                                  if (value.toString().length > 10)
+                                    return 'Invalid Aadhar Number';
+                                  return null;
+                                },
+                                controller: _textEditingController,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                   labelText: '   Enter the 10 digit Aadhar No.',
@@ -101,7 +126,87 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                   height: 57,
                                 ),
                                 MaterialButton(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    print(_textEditingController.text);
+                                    var response;
+                                    var requiredata;
+                                    var url =
+                                        'https://covid19-vaccine.herokuapp.com/api/';
+                                    try {
+                                      response = await http.get(url);
+                                      List Data = json.decode(response.body);
+
+                                      for (int i = 0; i < Data.length; i++) {
+                                        if (Data[i]["aadhar_number"]
+                                                .toString() ==
+                                            _textEditingController.text
+                                                .toString()) {
+                                          requiredata = Data[i];
+                                        } else {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return Dialog(
+                                                child: Container(
+                                                  height: 100,
+                                                  width: 100,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Center(
+                                                        child: Text(
+                                                      'Invalid Aadhar No.',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    )),
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                        }
+                                      }
+
+                                      if (requiredata["isVaccinated"] == true) {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return Dialog(
+                                                child: Container(
+                                                  height: 100,
+                                                  width: 100,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Center(
+                                                        child: Text(
+                                                      'Already Vaccinated',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    )),
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                      }
+                                      requiredata["isVaccinated"] = true;
+                                    } catch (e) {
+                                      print('Error');
+                                    }
+                                    try {
+                                      response = await http.put(url,
+                                          headers: {
+                                            'Content-type': 'application/json'
+                                          },
+                                          body: json.encode(requiredata));
+                                      print(response.body);
+                                    } catch (e) {
+                                      print(e.toString());
+                                    }
+                                  },
                                   child: Text(
                                     'Add',
                                     style: TextStyle(
@@ -147,100 +252,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           end: Alignment.bottomLeft,
                           stops: [0.1, 0.5, 0.7, 0.9],
                           colors: [
-                            Colors.blue[800],
-                            Colors.blue[700],
-                            Colors.blue[600],
-                            Colors.blue[400],
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(color: Colors.black26, blurRadius: 20.0)
-                        ],
-                        borderRadius: BorderRadius.circular(15)),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Active Cases:',
-                            style: TextStyle(
-                                color: Colors.blue[200],
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Text(
-                          '2000000',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    height: 100,
-                    width: MediaQuery.of(context).size.width / 2 - 20,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topRight,
-                          end: Alignment.bottomLeft,
-                          stops: [0.1, 0.5, 0.7, 0.9],
-                          colors: [
-                            Colors.orange[800],
-                            Colors.orange[700],
-                            Colors.orange[600],
-                            Colors.orange[400],
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(color: Colors.black26, blurRadius: 20.0)
-                        ],
-                        borderRadius: BorderRadius.circular(15)),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Recovered Cases:',
-                            style: TextStyle(
-                                color: Colors.orange[200],
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Text(
-                          '150,200',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    height: 100,
-                    width: MediaQuery.of(context).size.width / 2 - 20,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topRight,
-                          end: Alignment.bottomLeft,
-                          stops: [0.1, 0.5, 0.7, 0.9],
-                          colors: [
                             Colors.red[800],
                             Colors.red[700],
                             Colors.red[600],
@@ -256,16 +267,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            'Vaccines available in the stock:',
+                            'Vaccines available Per Day ',
                             style: TextStyle(
                                 color: Colors.red[200],
-                                fontSize: 20,
+                                fontSize: 17,
                                 fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
                         ),
                         Text(
-                          '2000',
+                          '2',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 22,
@@ -343,7 +354,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     BoxShadow(color: Colors.black26, blurRadius: 20.0)
                   ]),
               child: PieChart(
-                dataMap: dataMap,
+                dataMap: widget.dataMap,
                 animationDuration: Duration(milliseconds: 800),
                 chartLegendSpacing: 32,
                 chartRadius: MediaQuery.of(context).size.width + 4,
@@ -370,7 +381,37 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
             SizedBox(
               height: 50,
-            )
+            ),
+            InkWell(
+              onTap: () async {
+                await Authentication().signOut();
+              },
+              child: new Container(
+                decoration: BoxDecoration(
+                    border: Border.all(width: 2.0, color: Colors.greenAccent),
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(20.0)),
+                padding: EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Logout',
+                      style: GoogleFonts.varelaRound(
+                          color: Colors.greenAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30.0),
+                    ),
+                    SizedBox(
+                      width: 10.0,
+                    ),
+                  ],
+                ),
+                margin: EdgeInsets.symmetric(horizontal: 20.0),
+                height: 80,
+              ),
+            ),
           ],
         ),
       ),

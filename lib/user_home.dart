@@ -1,29 +1,41 @@
-import 'package:covid_vijay_app/added_member_status.dart';
 import 'package:covid_vijay_app/constants.dart';
-import 'package:covid_vijay_app/get_details.dart';
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'check_status.dart';
 
 class UserHome extends StatefulWidget {
+  final Map<String, double> dataMap;
+  UserHome({@required this.dataMap});
   @override
   _UserHomeState createState() => _UserHomeState();
 }
 
 class _UserHomeState extends State<UserHome> {
+ 
+
   TextEditingController _textEditingController;
-  Future<Details> details;
+ 
 
   @override
   void initState() {
     super.initState();
-    details = getDetails();
+    _textEditingController = TextEditingController();
+    //details = getDetails();
   }
 
-  Map<String, double> dataMap = {
-    "vaccinated": 80,
-    "notvaccinated": 20,
-  };
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the
+    // widget tree.
+    _textEditingController.dispose();
+    super.dispose();
+  }
+  
+
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +68,7 @@ class _UserHomeState extends State<UserHome> {
                     BoxShadow(color: Colors.black26, blurRadius: 20.0)
                   ]),
               child: PieChart(
-                dataMap: dataMap,
+                dataMap: widget.dataMap,
                 animationDuration: Duration(milliseconds: 800),
                 chartLegendSpacing: 32,
                 chartRadius: MediaQuery.of(context).size.width + 4,
@@ -112,17 +124,33 @@ class _UserHomeState extends State<UserHome> {
               height: 20.0,
             ),
             InkWell(
-              onTap: () {
-                FutureBuilder<Details>(
-                  future: details,
-                  builder: (context, snapshot) {
-                   
-                      return Dialog(
-                        
-                        child: Text(snapshot.data.name),
-                      );
-                  },
-                );
+              onTap: () async {
+                // print(_textEditingController.text);
+                var requireddata;
+                try {
+                  var url = 'https://covid19-vaccine.herokuapp.com/api/';
+                  final response = await http.get(url);
+
+                  List Data = json.decode(response.body);
+                  for (int i = 0; i < Data.length; i++) {
+
+
+                    if (Data[i]["aadhar_number"].toString() ==
+                        _textEditingController.text.toString()) {
+                      requireddata = Data[i];
+
+                      Navigator.of(context).pushNamed(
+                          DisplayVaccinationStatus.routeName,
+                          arguments: {'maindata': requireddata});
+                    } else {
+                      print('Invalid');
+                    }
+                  }
+                  
+                
+                } catch (e) {
+                  print('Error');
+                }
               },
               child: new Container(
                 decoration: BoxDecoration(
@@ -158,33 +186,7 @@ class _UserHomeState extends State<UserHome> {
             SizedBox(
               height: 50,
             ),
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddedMemberStatus(),
-                    ));
-              },
-              child: new Container(
-                decoration: BoxDecoration(
-                    border: Border.all(width: 2.0, color: Colors.greenAccent),
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(20.0)),
-                padding: EdgeInsets.all(10.0),
-                child: Center(
-                  child: Text(
-                    'Check added member\'s status',
-                    style: GoogleFonts.varelaRound(
-                        color: Colors.greenAccent,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20.0),
-                  ),
-                ),
-                margin: EdgeInsets.symmetric(horizontal: 20.0),
-                height: 50,
-              ),
-            ),
+
           ],
         ),
       ),

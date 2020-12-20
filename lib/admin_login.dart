@@ -1,4 +1,5 @@
-  
+import 'dart:convert';
+
 import 'package:covid_vijay_app/admin_dashboard.dart';
 import 'package:covid_vijay_app/onboarding.dart';
 import 'package:covid_vijay_app/services/auth.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'constants.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 class AdminLogin extends StatefulWidget {
   @override
@@ -13,6 +15,9 @@ class AdminLogin extends StatefulWidget {
 }
 
 class _AdminLoginState extends State<AdminLogin> {
+  Map<String, double> dataMap;
+  double vaccinated = 0;
+  double notvaccinated = 0;
   final _key = GlobalKey<FormState>();
   TextEditingController _textEditingController;
   String email;
@@ -20,7 +25,6 @@ class _AdminLoginState extends State<AdminLogin> {
   bool credentialTrue = true;
   @override
   Widget build(BuildContext context) {
-    final double height = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Stack(children: [
         Container(
@@ -100,6 +104,7 @@ class _AdminLoginState extends State<AdminLogin> {
                 child: TextFormField(
                   controller: _textEditingController,
                   onChanged: (val) {
+                    
                     password = val;
                   },
                   keyboardType: TextInputType.emailAddress,
@@ -120,30 +125,50 @@ class _AdminLoginState extends State<AdminLogin> {
                 height: 20,
               ),
               GestureDetector(
-                onTap: () async {
-                  _key.currentState.save();
-                  _key.currentState.validate();
-                  dynamic user = await Authentication()
-                      .signIn(email: email, password: password);
+                  onTap: () async {
+                    _key.currentState.save();
+                    _key.currentState.validate();
+                    dynamic user = await Authentication()
+                        .signIn(email: email, password: password);
 
-                  if (user == null)
-                    setState(() {
-                      credentialTrue = false;
-                    });
-                  if (credentialTrue == false)
-                    Text(
-                      "Wrong username or password",
-                      style: TextStyle(color: Colors.red),
-                    );
-                  if (_key.currentState.validate()) {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AdminDashboard(),
-                        ));
-                  }
-                },
-                child: Container(
+                    if (user == null)
+                      setState(() {
+                        credentialTrue = false;
+                      });
+                    if (credentialTrue == false)
+                      Text(
+                        "Wrong username or password",
+                        style: TextStyle(color: Colors.red),
+                      );
+                    if (_key.currentState.validate()) {
+                      var url = 'https://covid19-vaccine.herokuapp.com/api/';
+                      final response = await http.get(url);
+
+                      List Data = json.decode(response.body);
+                      for (int i = 0; i < Data.length; i++) {
+                        if (Data[i]["isVaccinated"]) vaccinated++;
+                        if (!Data[i]["isVaccinated"]) notvaccinated++;
+                      }
+
+                      setState(() {
+                        dataMap = {
+                          "vaccinated": vaccinated,
+                          "notvaccinated": notvaccinated,
+                        };
+                      });
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AdminDashboard(
+                              dataMap: {
+                                "vaccinated": vaccinated,
+                                "notvaccinated": notvaccinated,
+                              },
+                            ),
+                          ));
+                    }
+                  },
+                  child: Container(
                     width: 350,
                     height: 60,
                     margin: EdgeInsets.fromLTRB(20, 5, 20, 15),
@@ -172,9 +197,8 @@ class _AdminLoginState extends State<AdminLogin> {
                         margin: EdgeInsets.symmetric(horizontal: 20.0),
                         height: 80,
                       ),
-),
-                )),
-            
+                    ),
+                  )),
               Container(
                 margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                 width: double.maxFinite,
