@@ -155,17 +155,27 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                                 child: Container(
                                                   height: 100,
                                                   width: 100,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Center(
-                                                        child: Text(
-                                                      'Already Vaccinated',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    )),
+                                                  child: Column(
+                                                    children: [
+                                                      IconButton(
+                                                        icon: Icon(Icons.close),
+                                                        onPressed: (){
+                                                          Navigator.pop(context);
+                                                        },
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                                8.0),
+                                                        child: Center(
+                                                            child: Text(
+                                                          'Already Vaccinated',
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight.bold),
+                                                        )),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
                                               );
@@ -185,6 +195,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     } catch (e) {
                                       print(e.toString());
                                     }
+                                    Navigator.of(context).pop();
                                   },
                                   child: Text(
                                     'Add',
