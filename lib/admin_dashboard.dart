@@ -143,28 +143,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                                 .toString()) {
                                           requiredata = Data[i];
                                         } else {
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return Dialog(
-                                                child: Container(
-                                                  height: 100,
-                                                  width: 100,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Center(
-                                                        child: Text(
-                                                      'Invalid Aadhar No.',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    )),
-                                                  ),
-                                                ),
-                                              );
-                                            });
+                                          print('invalid');
                                         }
                                       }
 
